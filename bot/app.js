@@ -9,8 +9,8 @@ client.on("ready", () => {
     channel = client.channels.cache.find(channel => channel.name === config.channel)
 });
 
-schedule.scheduleJob({hour: 13, minute: 16}, () => {
-    sendMessage('cool');
+schedule.scheduleJob({hour: 13, minute: 38}, () => {
+    sendMessage('not cool antenn');
 });
 
 function sendMessage(message){
