@@ -1,14 +1,20 @@
 const schedule = require('node-schedule');
 const Discord = require('discord.js');
 const config = require('./config.json');
+const client = new Discord.Client();  
+let channel;
 
-bot.on("ready", () => {
-    bot.user.setGame('Checking you Schedule');
-    console.log(`Bot is online!\n${bot.users.size} users, in ${bot.guilds.size} servers connected.`);
+client.on("ready", () => {
+    console.log(`Bot is online!`);
+    channel = client.channels.cache.find(channel => channel.name === config.channel)
 });
 
-schedule.scheduleJob({hour: 12, minute: 32}, () => {
-    console.log('cool');
+schedule.scheduleJob({hour: 13, minute: 16}, () => {
+    sendMessage('cool');
 });
 
-bot.login(config.token);
+function sendMessage(message){
+    channel.send(message)
+}
+
+client.login(config.token);
