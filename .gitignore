@@ -1,3 +1,11 @@
+
+# GITIGNORES ADDED BY ME
+
+config.json
+
+#
+
+
 # Logs
 logs
 *.log
