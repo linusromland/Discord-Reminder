@@ -1,15 +1,15 @@
-const fs = require('fs');
-const readline = require('readline');
-const { google } = require('googleapis');
+const fs = require("fs");
+const readline = require("readline");
+const { google } = require("googleapis");
+const lessons = require("./lessons.json");
 
 // If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
+const SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
 
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
-const TOKEN_PATH = 'token.json';
-
+const TOKEN_PATH = "token.json";
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -18,16 +18,19 @@ const TOKEN_PATH = 'token.json';
  * @param {function} callback The callback to call with the authorized client.
  */
 function authorize(credentials, callback, msg) {
-    const { client_secret, client_id, redirect_uris } = credentials.installed;
-    const oAuth2Client = new google.auth.OAuth2(
-        client_id, client_secret, redirect_uris[0]);
+  const { client_secret, client_id, redirect_uris } = credentials.installed;
+  const oAuth2Client = new google.auth.OAuth2(
+    client_id,
+    client_secret,
+    redirect_uris[0]
+  );
 
-    // Check if we have previously stored a token.
-    fs.readFile(TOKEN_PATH, (err, token) => {
-        if (err) return getAccessToken(oAuth2Client, callback);
-        oAuth2Client.setCredentials(JSON.parse(token));
-        callback(oAuth2Client, msg);
-    });
+  // Check if we have previously stored a token.
+  fs.readFile(TOKEN_PATH, (err, token) => {
+    if (err) return getAccessToken(oAuth2Client, callback);
+    oAuth2Client.setCredentials(JSON.parse(token));
+    callback(oAuth2Client, msg);
+  });
 }
 
 /**
@@ -37,28 +40,28 @@ function authorize(credentials, callback, msg) {
  * @param {getEventsCallback} callback The callback for the authorized client.
  */
 function getAccessToken(oAuth2Client, callback) {
-    const authUrl = oAuth2Client.generateAuthUrl({
-        access_type: 'offline',
-        scope: SCOPES,
+  const authUrl = oAuth2Client.generateAuthUrl({
+    access_type: "offline",
+    scope: SCOPES,
+  });
+  console.log("Authorize this app by visiting this url:", authUrl);
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  rl.question("Enter the code from that page here: ", (code) => {
+    rl.close();
+    oAuth2Client.getToken(code, (err, token) => {
+      if (err) return console.error("Error retrieving access token", err);
+      oAuth2Client.setCredentials(token);
+      // Store the token to disk for later program executions
+      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+        if (err) return console.error(err);
+        console.log("Token stored to", TOKEN_PATH);
+      });
+      callback(oAuth2Client);
     });
-    console.log('Authorize this app by visiting this url:', authUrl);
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
-    rl.question('Enter the code from that page here: ', (code) => {
-        rl.close();
-        oAuth2Client.getToken(code, (err, token) => {
-            if (err) return console.error('Error retrieving access token', err);
-            oAuth2Client.setCredentials(token);
-            // Store the token to disk for later program executions
-            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-                if (err) return console.error(err);
-                console.log('Token stored to', TOKEN_PATH);
-            });
-            callback(oAuth2Client);
-        });
-    });
+  });
 }
 
 /**
@@ -66,22 +69,39 @@ function getAccessToken(oAuth2Client, callback) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 function listEvents(auth, msg) {
-    const calendar = google.calendar({ version: 'v3', auth });
-    calendar.events.list({
-        calendarId: 'cadcj4h1nolpoaep1bkkj3jc7s@group.calendar.google.com',
-        timeMin: (new Date()).toISOString(),
-        maxResults: 10,
-        singleEvents: true,
-        orderBy: 'startTime',
-    }, (err, res) => {
-        if (err) return console.log('The API returned an error: ' + err);
-        const events = res.data.items;
-        if (events.length) {
-            console.log(events)
-        } else {
-            console.log('No upcoming events found.');
+  const calendar = google.calendar({ version: "v3", auth });
+  calendar.events.list(
+    {
+      calendarId: "cadcj4h1nolpoaep1bkkj3jc7s@group.calendar.google.com",
+      timeMin: new Date().toISOString(),
+      maxResults: 10,
+      singleEvents: true,
+      orderBy: "startTime",
+    },
+    (err, res) => {
+      if (err) return console.log("The API returned an error: " + err);
+      const events = res.data.items;
+      if (events.length) {
+        //console.log(events);
+        let startDate = new Date(
+            events[0].start.dateTime || events[0].start.date
+        );
+        console.log(Date.now())
+        console.log(startDate.getTime() - 300)
+        if (startDate.getTime() + 300 < Date.now()) {
+            console.log(startDate.getHours() + "min: " + startDate.getMinutes() - 5)
+          schedule.scheduleJob(
+            { hour: startDate.getHours(), minute: startDate.getMinutes() - 5 },
+            () => {
+              msg.send("not cool antenn");
+            }
+          );
         }
-    });
+      } else {
+        console.log("No upcoming events found.");
+      }
+    }
+  );
 }
 
-module.exports = { authorize, listEvents }
+module.exports = { authorize, listEvents };

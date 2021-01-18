@@ -20,10 +20,6 @@ client.on("ready", () => {
   );
 });
 
-schedule.scheduleJob({ hour: 12, minute: 101 }, () => {
-  sendMessage("not cool antenn");
-});
-
 function sendMessage(message) {
   channel.send(message);
 }
