@@ -119,9 +119,7 @@ async function scheduleJob(events, msg, i) {
         schedule.scheduleJob(
           { hour: printDate.getHours(), minute: printDate.getMinutes() },
           () => {
-            msg.send(
-              "Lektionen " + events[i].summary + " börjar om 5 minuter!"
-            );
+            msg.send(printFormattedMessage(events[i]));
             console.log("resolv jopn");
             resolve();
           }
@@ -133,6 +131,24 @@ async function scheduleJob(events, msg, i) {
       reject();
     }
   });
+}
+
+function printFormattedMessage(event){
+  let tmp;
+  lessons.lessons.forEach(element => {
+    if(event.summary == element.kurskod){
+      element.people.forEach(person => {
+        lessons.peopleId.forEach(personId => {
+          if (person.name == personId.name) {
+            console.log(person.name + personId.name)
+            tmp += "<@" + personId.id + ">, "
+          }
+        })
+      })
+    }
+  });
+  tmp +=  "Lektionen " + event.summary + " börjar om 5 minuter!"
+  return tmp;
 }
 
 module.exports = { authorize, listEvents };
