@@ -1,0 +1,55 @@
+{
+  "lessons": [
+    {
+      "kurskod": "DIGDIG01",
+      "people": ["linus", "markus"],
+      "meetLink": "Discord"
+    },
+    {
+      "kurskod": "ENGENG07",
+      "people": ["linus", "anton", "svante"],
+      "meetLink": "https://meet.google.com/lookup/hwijnokvek"
+    },
+    {
+      "kurskod": "PRRPRR02",
+      "people": ["linus", "markus", "anton", "svante"],
+      "meetLink": "Discord"
+    },
+    {
+      "kurskod": "GYAR",
+      "people": ["linus", "markus", "anton", "svante"],
+      "meetLink": "https://meet.google.com/lookup/ds7dunefjm"
+    },
+    {
+      "kurskod": "KEMKEM01",
+      "people": ["linus", "markus", "anton", "svante"],
+      "meetLink": "https://meet.google.com/lookup/f3p5jixdbn"
+    },
+    {
+      "kurskod": "WESWEB01",
+      "people": ["linus", "markus", "svante"],
+      "meetLink": "Discord"
+    },
+    {
+      "kurskod": "WEUWEB02",
+      "people": ["linus", "markus", "svante"],
+      "meetLink": "Discord"
+    },
+    {
+      "kurskod": "SVESVE03",
+      "people": ["linus", "markus", "anton", "svante"],
+      "meetLink": "https://meet.google.com/vba-nvqh-zeh"
+    },
+    {
+      "kurskod": "test",
+      "people": ["linus", "markus"],
+      "meetLink": "cooling"
+    }
+  ],
+  "people": [
+    { "linus": "400691601011113986" },
+    { "markus": "292403753360031745" },
+    { "anton": "231711102931697665" },
+    { "svante": "225636267633803274" }
+  ]
+}

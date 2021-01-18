@@ -2,7 +2,8 @@
 # GITIGNORES ADDED BY ME
 
 config.json
-
+token.json
+credentials.json
 #
 
 
