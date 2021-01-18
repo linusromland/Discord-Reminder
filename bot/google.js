@@ -2,6 +2,7 @@ const fs = require("fs");
 const readline = require("readline");
 const { google } = require("googleapis");
 const lessons = require("./lessons.json");
+const schedule = require("node-schedule");
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
@@ -39,7 +40,7 @@ function authorize(credentials, callback, msg) {
  * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
  * @param {getEventsCallback} callback The callback for the authorized client.
  */
-function getAccessToken(oAuth2Client, callback) {
+function getAccessToken(oAuth2Client, callback, msg) {
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: "offline",
     scope: SCOPES,
@@ -59,7 +60,7 @@ function getAccessToken(oAuth2Client, callback) {
         if (err) return console.error(err);
         console.log("Token stored to", TOKEN_PATH);
       });
-      callback(oAuth2Client);
+      callback(oAuth2Client, msg);
     });
   });
 }
@@ -68,40 +69,54 @@ function getAccessToken(oAuth2Client, callback) {
  * Lists the next 10 events on the user's primary calendar.
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
-function listEvents(auth, msg) {
-  const calendar = google.calendar({ version: "v3", auth });
-  calendar.events.list(
-    {
-      calendarId: "cadcj4h1nolpoaep1bkkj3jc7s@group.calendar.google.com",
-      timeMin: new Date().toISOString(),
-      maxResults: 10,
-      singleEvents: true,
-      orderBy: "startTime",
-    },
-    (err, res) => {
-      if (err) return console.log("The API returned an error: " + err);
-      const events = res.data.items;
-      if (events.length) {
-        //console.log(events);
-        let startDate = new Date(
+async function listEvents(auth, msg) {
+  return new Promise((resolve, reject) => {
+    const calendar = google.calendar({ version: "v3", auth });
+    calendar.events.list(
+      {
+        calendarId: "cadcj4h1nolpoaep1bkkj3jc7s@group.calendar.google.com",
+        timeMin: new Date().toISOString(),
+        maxResults: 10,
+        singleEvents: true,
+        orderBy: "startTime",
+      },
+      (err, res) => {
+        if (err) return console.log("The API returned an error: " + err);
+        const events = res.data.items;
+        if (events.length) {
+          //console.log(events);
+          let startDate = new Date(
             events[0].start.dateTime || events[0].start.date
-        );
-        console.log(Date.now())
-        console.log(startDate.getTime() - 300)
-        if (startDate.getTime() + 300 < Date.now()) {
-            console.log(startDate.getHours() + "min: " + startDate.getMinutes() - 5)
-          schedule.scheduleJob(
-            { hour: startDate.getHours(), minute: startDate.getMinutes() - 5 },
-            () => {
-              msg.send("not cool antenn");
-            }
           );
+          console.log(startDate.getTime());
+          //startdate = startDate.getTime() - 300000;
+          let printDate = new Date(startDate.getTime() - 300000);
+          console.log(printDate.getTime());
+          console.log(Date.now());
+          if (printDate.getTime() > Date.now()) {
+            console.log(
+              printDate.getHours().toString() +
+                "min: " +
+                printDate.getMinutes().toString()
+            );
+            schedule.scheduleJob(
+              { hour: printDate.getHours(), minute: printDate.getMinutes() },
+              () => {
+                msg.send(
+                  "Lektionen " + events[0].summary + " börjar om 5 minuter!"
+                );
+                resolve()
+              }
+            );
+          }
+        } else {
+          console.log("No upcoming events found.");
+          reject()
+
         }
-      } else {
-        console.log("No upcoming events found.");
       }
-    }
-  );
+    );
+  });
 }
 
 module.exports = { authorize, listEvents };
