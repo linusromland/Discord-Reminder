@@ -43,7 +43,7 @@
     {
       "kurskod": "test",
       "people": ["linus", "markus"],
-      "meetLink": "cooling"
+      "meetLink": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     }
   ],
   "peopleId": [
