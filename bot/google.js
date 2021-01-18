@@ -133,25 +133,29 @@ async function scheduleJob(events, msg, i) {
   });
 }
 
-function printFormattedMessage(event){
+function printFormattedMessage(event) {
   let tmp = "";
-  lessons.lessons.forEach(element => {
-    if(event.summary == element.kurskod){
-      element.people.forEach(person => {
-        lessons.peopleId.forEach(personId => {
-          console.log("person " + person, "element " + element, "id " + personId)
+  lessons.lessons.forEach((element) => {
+    if (event.summary == element.kurskod) {
+      element.people.forEach((person) => {
+        lessons.peopleId.forEach((personId) => {
+          console.log(
+            "person " + person,
+            "element " + element,
+            "id " + personId
+          );
           if (person == personId.name) {
             //console.log(person.name + personId.name)
-            tmp += "<@" + personId.id + ">,   "
+            tmp += "<@" + personId.id + ">,   ";
           }
-        })
-      })
+        });
+      });
     }
   });
-  tmp +=  "lektionen " + event.summary + " börjar om 5 minuter!"
-  lessons.lessons.forEach(element => {
-    if(event.summary == element.kurskod){
-      tmp += "\n Lektion finns på: " + element.meetLink
+  tmp += "lektionen " + event.summary + " börjar om 5 minuter!";
+  lessons.lessons.forEach((element) => {
+    if (event.summary == element.kurskod) {
+      tmp += "\n Lektion finns på: " + element.meetLink;
     }
   });
   return tmp;
