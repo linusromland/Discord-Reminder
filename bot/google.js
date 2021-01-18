@@ -30,7 +30,7 @@ function authorize(credentials, callback, msg) {
   fs.readFile(TOKEN_PATH, (err, token) => {
     if (err) return getAccessToken(oAuth2Client, callback);
     oAuth2Client.setCredentials(JSON.parse(token));
-    callback(oAuth2Client, msg);
+    callback(oAuth2Client);
   });
 }
 
@@ -60,7 +60,7 @@ function getAccessToken(oAuth2Client, callback, msg) {
         if (err) return console.error(err);
         console.log("Token stored to", TOKEN_PATH);
       });
-      callback(oAuth2Client, msg);
+      callback(oAuth2Client);
     });
   });
 }
@@ -70,7 +70,8 @@ function getAccessToken(oAuth2Client, callback, msg) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 async function listEvents(auth, msg) {
-  return new Promise((resolve, reject) => {
+  console.log("new listEvent");
+  return new Promise(async (resolve, reject) => {
     const calendar = google.calendar({ version: "v3", auth });
     calendar.events.list(
       {
@@ -80,42 +81,57 @@ async function listEvents(auth, msg) {
         singleEvents: true,
         orderBy: "startTime",
       },
-      (err, res) => {
+      async (err, res) => {
         if (err) return console.log("The API returned an error: " + err);
         const events = res.data.items;
         if (events.length) {
-          //console.log(events);
           let startDate = new Date(
             events[0].start.dateTime || events[0].start.date
           );
-          console.log(startDate.getTime());
-          //startdate = startDate.getTime() - 300000;
           let printDate = new Date(startDate.getTime() - 300000);
-          console.log(printDate.getTime());
-          console.log(Date.now());
           if (printDate.getTime() > Date.now()) {
-            console.log(
-              printDate.getHours().toString() +
-                "min: " +
-                printDate.getMinutes().toString()
-            );
-            schedule.scheduleJob(
-              { hour: printDate.getHours(), minute: printDate.getMinutes() },
-              () => {
-                msg.send(
-                  "Lektionen " + events[0].summary + " börjar om 5 minuter!"
-                );
-                resolve()
-              }
-            );
+            await scheduleJob(events, msg, 0);
+            console.log("resolv with 0");
+            resolve();
+          } else {
+            await scheduleJob(events, msg, 1);
+            console.log("resolv with 1");
+            resolve();
           }
         } else {
           console.log("No upcoming events found.");
-          reject()
-
+          reject();
         }
       }
     );
+  });
+}
+async function scheduleJob(events, msg, i) {
+  console.log("new job");
+  return new Promise((resolve, reject) => {
+    if (events.length) {
+      let startDate = new Date(
+        events[i].start.dateTime || events[0].start.date
+      );
+      let printDate = new Date(startDate.getTime() - 300000);
+      if (printDate.getTime() > Date.now()) {
+        console.log("new job active at " + printDate.getMinutes());
+        schedule.scheduleJob(
+          { hour: printDate.getHours(), minute: printDate.getMinutes() },
+          () => {
+            msg.send(
+              "Lektionen " + events[i].summary + " börjar om 5 minuter!"
+            );
+            console.log("resolv jopn");
+            resolve();
+          }
+        );
+      } else {
+      }
+    } else {
+      console.log("No upcoming events found.");
+      reject();
+    }
   });
 }
 
