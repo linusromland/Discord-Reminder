@@ -134,14 +134,15 @@ async function scheduleJob(events, msg, i) {
 }
 
 function printFormattedMessage(event){
-  let tmp;
+  let tmp = "";
   lessons.lessons.forEach(element => {
     if(event.summary == element.kurskod){
       element.people.forEach(person => {
         lessons.peopleId.forEach(personId => {
-          if (person.name == personId.name) {
-            console.log(person.name + personId.name)
-            tmp += "<@" + personId.id + ">, "
+          console.log("person " + person, "element " + element, "id " + personId)
+          if (person == personId.name) {
+            //console.log(person.name + personId.name)
+            tmp += "<@" + personId.id + ">,   "
           }
         })
       })
