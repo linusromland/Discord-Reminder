@@ -162,12 +162,22 @@ function printFormattedMessage(event) {
       });
     }
   });
+  let notNormalLesson = false;
+  if (tmp == "") {
+    notNormalLesson = true
+  }
   tmp += "lektionen " + event.summary + " börjar om 5 minuter!";
-  lessons.lessons.forEach((element) => {
-    if (event.summary == element.kurskod) {
-      tmp += "\n Lektion finns på: " + element.meetLink;
-    }
-  });
+  
+  if (notNormalLesson) {
+    console.log(event)
+    tmp += "\n" + event.description
+  }else{
+    lessons.lessons.forEach((element) => {
+      if (event.summary == element.kurskod) {
+        tmp += "\n Lektion finns på: " + element.meetLink;
+      }
+    });
+  }
   return tmp;
 }
 
