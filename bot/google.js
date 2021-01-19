@@ -77,7 +77,7 @@ async function listEvents(auth, msg) {
       {
         calendarId: "cadcj4h1nolpoaep1bkkj3jc7s@group.calendar.google.com",
         timeMin: new Date().toISOString(),
-        maxResults: 10,
+        maxResults: 2,
         singleEvents: true,
         orderBy: "startTime",
       },
@@ -117,13 +117,16 @@ async function listEvents(auth, msg) {
   });
 }
 async function scheduleJob(events, msg, i) {
-  console.log("new job");
+  console.log(events)
+  console.log(i);
   return new Promise((resolve, reject) => {
     if (events.length) {
+      console.log("passed check events.length in schedule")
       let startDate = new Date(
         events[i].start.dateTime || events[0].start.date
       );
       let printDate = new Date(startDate.getTime() - 300000);
+      console.log(printDate)
       if (printDate.getTime() > Date.now()) {
         console.log("new job active at " + printDate.getMinutes());
         schedule.scheduleJob(
