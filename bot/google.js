@@ -89,18 +89,28 @@ async function listEvents(auth, msg) {
             events[0].start.dateTime || events[0].start.date
           );
           let printDate = new Date(startDate.getTime() - 300000);
-          if (printDate.getTime() > Date.now()) {
+          let currentDate = new Date();
+          let dateOnSchedule = printDate.getFullYear().toString() + printDate.getMonth().toString() + printDate.getDate().toString()
+          let dateRightNow = currentDate.getFullYear().toString() +  currentDate.getMonth().toString()  + currentDate.getDate().toString()
+          if (printDate.getTime() > Date.now() && dateOnSchedule == dateRightNow) {
             await scheduleJob(events, msg, 0);
             console.log("resolv with 0");
             resolve();
-          } else {
+          } else if(events[1]) {
             await scheduleJob(events, msg, 1);
             console.log("resolv with 1");
             resolve();
           }
+          else{
+            setTimeout(function() {
+              resolve();
+            }, 30000);
+          }
         } else {
           console.log("No upcoming events found.");
-          reject();
+          setTimeout(function() {
+            resolve();
+          }, 30000);
         }
       }
     );
