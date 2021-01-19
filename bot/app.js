@@ -8,6 +8,7 @@ let channel;
 
 client.on("ready", () => {
   console.log(`Bot is online!`);
+  client.user.setActivity('your schedule', { type: 'WATCHING' });
   channel = client.channels.cache.find(
     (channel) => channel.name === config.channel
   );
